@@ -43,7 +43,7 @@ class Loan:
         The interest charged for a given month, at the current amount.
         """
         monthly_interest_rate = interest_rate / 12
-        monthly_interest = (amount - offset_amount) * monthly_interest_rate
+        monthly_interest = max(amount - offset_amount, 0) * monthly_interest_rate
         return monthly_interest
 
     def calculate_monthly_stats(self):
@@ -54,44 +54,54 @@ class Loan:
         principal = self.initial_amount
         monthly_interest_charges = []
         monthly_principal = []
-        monthly_amount_owing = []
+        monthly_payments = []
         amount_owing = self.monthly_payment_io * num_io_payments + \
                        self.monthly_payment_pi * num_pi_payments
         for payment in range(num_payments):
+
             interest = self.compute_monthly_interest(
                 principal, self.interest_rate, self.offset_amount)
             monthly_interest_charges.append(interest)
 
             monthly_principal.append(principal)
             if payment < num_io_payments:
+                # We're in the IO period.
                 principal_paid = 0
+                monthly_payments.append(self.monthly_payment_io)
             else:
-                principal_paid = self.monthly_payment_pi - interest
-            principal -= principal_paid
+                # We're paying principal.
+                payment = self.monthly_payment_pi
+                principal_paid = payment - interest
+                if (principal - principal_paid) < 0:
+                    # We're paying off the loan.
+                    payment -= (principal_paid - principal)
+                    principal_paid = principal
+                monthly_payments.append(payment)
 
-            monthly_amount_owing.append(amount_owing)
+            principal -= principal_paid
 
             if payment < num_io_payments:
                 amount_owing -= self.monthly_payment_io
             else:
-                amount_owing -= self.monthly_payment_pi
+                amount_owing -= payment#self.monthly_payment_pi
 
             if principal <= 0:
                 break
 
-        return monthly_principal, monthly_amount_owing, monthly_interest_charges
+        return monthly_principal, monthly_interest_charges, monthly_payments
 
-def plot(period, monthly_principal, monthly_amount_owing):
+
+def plot(period, monthly_principal, title="Loan principal"):
     num_payments = len(monthly_principal)#period * 12
     x = list(range(num_payments))
     x = [val / 12 for val in x]
     fig, ax = plt.subplots()
     ax.plot(x, np.divide(monthly_principal, 1000), label="Principal")
-    ax.plot(x, np.divide(monthly_amount_owing, 1000), label="Amount owing")
+    ax.set_title(title)
     ax.set_xlabel("Year")
     ax.set_ylabel("Amount ($ thousands)")
     ax.legend(loc='upper right')  # , shadow=True)
-    plt.show()
+
 
 def test_ep_loan():
     amount = 476000
@@ -107,10 +117,10 @@ def test_ep_loan():
     print("Monthly loan payment (IO): $%.2f" % loan.monthly_payment_io)
     print("Monthly loan payment (PI): $%.2f" % loan.monthly_payment_pi)
 
-    monthly_principal, monthly_amount_owing, monthly_interest_charges = \
+    monthly_principal, monthly_interest_charges = \
         loan.calculate_monthly_stats()
 
-    plot(period, monthly_principal, monthly_amount_owing)
+    plot(period, monthly_principal)
 
 def scenario_sc_io():
     # P+I EP loan at lower interest rate.
@@ -118,7 +128,7 @@ def scenario_sc_io():
     # IO SC loan at higher interest rate.
     sc_loan = Loan(237000, 25, 0.0483, 2)
 
-    monthly_principal, monthly_amount_owing, monthly_interest_charges = \
+    monthly_principal, monthly_interest_charges = \
         ep_loan.calculate_monthly_stats()
     ep_loan_total_interest = sum(monthly_interest_charges)
     print("Total interest paid on EP loan: %f" % ep_loan_total_interest)
@@ -129,17 +139,50 @@ def scenario_offset_vs_lower_interest():
     rate. $10k of the offset account is kept as reserve, and the rest paid off the
     loan.
     """
-    amount = 476000
-    period = 25
-    offset_amount = 100000
+    ep = True
+    if ep:
+        # Erskine park loan.
+        amount = 470000
+        period = 30
+        # BOQ
+        offset_amount = 100000
+        boq_interest_rate = 0.041
+        # UBank
+        amount_paid_off = 90000 # Leaving 10k in bank.
+        ubank_interest_rate = 0.037
+
     # The EP loan, P+I, with a $100,000 offset account.
-    offset_loan = Loan(amount, period, 0.042, 0, offset_amount)
-    # The EP loan, P+I, with no offset account but paid off $90k.
-
-    monthly_principal, monthly_amount_owing, monthly_interest_charges = \
+    offset_loan = Loan(amount, period, boq_interest_rate, 0, offset_amount)
+    monthly_principal, monthly_interest_charges, monthly_payments = \
         offset_loan.calculate_monthly_stats()
+    # print(sum(monthly_payments) - amount)
+    # print(monthly_payments)
+    # print(monthly_principal)
+    print("Loan with offset account")
+    print("Amount %d, period %d, interest rate %.4f, offset amount %d" %
+          (amount, period, boq_interest_rate, offset_amount))
+    print("Monthly loan payment (PI): $%.2f" % offset_loan.monthly_payment_pi)
+    print("Total interest paid: $%.2f" % sum(monthly_interest_charges))
+    plot(period, monthly_principal, "Principal on loan with offset account")
 
-    plot(period, monthly_principal, monthly_amount_owing)
+    print()
+    # The EP loan, P+I, with no offset account but paid off $90k.
+    # Treat the amount paid off as offset, since the repayments will be based on
+    # the initial principal
+    offset_loan = Loan(amount, period, ubank_interest_rate, 0, amount_paid_off)
+    monthly_principal, monthly_interest_charges, monthly_payments = \
+        offset_loan.calculate_monthly_stats()
+    print("Loan with amount paid off and lower interest rate")
+    print("Amount %d, period %d, interest rate %.4f, amount paid off %d" %
+          (amount, period, ubank_interest_rate, amount_paid_off))
+    print("Monthly loan payment (PI): $%.2f" % offset_loan.monthly_payment_pi)
+    print("Total interest paid: $%.2f" % sum(monthly_interest_charges))
+    plot(period, monthly_principal,
+         "Principal on loan with some paid off and lower rate")
+
+    plt.show()
+
+
 
 def main():
     # scenario_sc_io()
