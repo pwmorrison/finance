@@ -141,7 +141,7 @@ def scenario_offset_vs_lower_interest():
     """
     ep = True
     if ep:
-        # Erskine park loan.
+        # EP loan.
         amount = 470000
         period = 30
         # BOQ
@@ -151,6 +151,20 @@ def scenario_offset_vs_lower_interest():
         amount_paid_off = 90000 # Leaving 10k in bank.
         ubank_interest_rate = 0.037
 
+        # Note, this doesn't consider the fact that we'll have the majority of the
+        # 10k in a high-interest account. For example, with 10k in an ING savings
+        # maximiser for 30 years at 2.9%, we'll have $23,844.
+    else:
+        # SC loan.
+        amount = 237000
+        period = 30
+        # BOQ
+        offset_amount = 0
+        boq_interest_rate = 0.047
+        # UBank
+        amount_paid_off = 0
+        ubank_interest_rate = 0.0409
+
     # The EP loan, P+I, with a $100,000 offset account.
     offset_loan = Loan(amount, period, boq_interest_rate, 0, offset_amount)
     monthly_principal, monthly_interest_charges, monthly_payments = \
@@ -158,6 +172,7 @@ def scenario_offset_vs_lower_interest():
     # print(sum(monthly_payments) - amount)
     # print(monthly_payments)
     # print(monthly_principal)
+    # print(len(monthly_principal))
     print("Loan with offset account")
     print("Amount %d, period %d, interest rate %.4f, offset amount %d" %
           (amount, period, boq_interest_rate, offset_amount))
@@ -172,6 +187,9 @@ def scenario_offset_vs_lower_interest():
     offset_loan = Loan(amount, period, ubank_interest_rate, 0, amount_paid_off)
     monthly_principal, monthly_interest_charges, monthly_payments = \
         offset_loan.calculate_monthly_stats()
+    print(monthly_principal)
+    print(len(monthly_principal))
+    # return
     print("Loan with amount paid off and lower interest rate")
     print("Amount %d, period %d, interest rate %.4f, amount paid off %d" %
           (amount, period, ubank_interest_rate, amount_paid_off))
