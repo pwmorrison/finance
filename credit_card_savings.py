@@ -18,28 +18,19 @@ class CreditCard:
         self.statement_period = statement_period
         self.interest_free_period = interest_free_period
         self.balance = 0
-        # The amount owing at the due date, from the previous month.
-        self.amount_owing = 0
 
     def make_purchases(self, amount):
         self.balance += amount
 
     def new_month(self):
-        self.amount_owing = self.balance
+        # Return the amount and when to pay it.
+        return self.balance, self.get_due_date()
 
     def get_balance(self):
         return self.balance
 
-    def pay_balance(self):
-        self.balance = 0
-        self.amount_owing = 0
-
-    def get_amount_owing(self):
-        return self.amount_owing
-
-    def pay_amount_owing(self):
-        self.balance -= self.amount_owing
-        self.amount_owing = 0
+    def pay_amount(self, amount):
+        self.balance -= amount
 
     def get_due_date(self):
         return self.interest_free_period - self.statement_period
@@ -54,7 +45,7 @@ def simulate_period(
     costs_per_day = costs / days_per_month
     bank_account = initial_bank_account_balance
     bank_account_history = []
-
+    pending_cc_payments = []
     for month in range(timeframe):
         # # Earn interest on the current account balance.
         # interest = (interest_rate / 12) * bank_account
@@ -62,9 +53,8 @@ def simulate_period(
         # Get paid, assuming we get paid at the start of the month.
         bank_account += pay
         if credit_card is not None:
-            credit_card.new_month()
-            # Determine which day of this month to pay the credit card balance.
-            due_date = credit_card.get_due_date()
+            cc_next_pay_amount, cc_next_pay_day = credit_card.new_month()
+            pending_cc_payments.append([cc_next_pay_amount, cc_next_pay_day])
         for day in range(days_per_month):
             # Earn interest on the current account balance.
             interest = (interest_rate / 365) * bank_account
@@ -78,14 +68,19 @@ def simulate_period(
                 # Pay straight from the bank account.
                 bank_account -= costs_per_day
 
-            # Pay the credit card.
-            if credit_card is not None and day == due_date:
-                # balance = credit_card.get_balance()
-                # bank_account -= balance
-                # credit_card.pay_balance()
-                amount_owing = credit_card.get_amount_owing()
-                bank_account -= amount_owing
-                credit_card.pay_amount_owing()
+            # Pay the credit card if its due.
+            if credit_card:
+                # Pay each of the due credit card payments.
+                for i, pending_cc_payment in enumerate(pending_cc_payments):
+                    if pending_cc_payment[1] == 0:
+                        # This payment is due.
+                        amount_due = pending_cc_payment[0]
+                        bank_account -= amount_due
+                        credit_card.pay_amount(amount_due)
+                        pending_cc_payments.remove(pending_cc_payment)
+                    else:
+                        # We're 1 day closer to the due date.
+                        pending_cc_payment[1] -= 1
 
             bank_account_history.append(bank_account)
 
@@ -93,7 +88,7 @@ def simulate_period(
         # Make the final payment.
         balance = credit_card.get_balance()
         bank_account -= balance
-        credit_card.pay_balance()
+        credit_card.pay_amount(balance)
         bank_account_history.append(bank_account)
     else:
         # Make a corresponding entry, so the history lengths are equal
@@ -113,6 +108,7 @@ def main():
     pay = 5000  # per month
     costs = 4000  # per month
     interest_rate = 0.04  # 4%, currently common for home loans.
+    interest_free_period = 55
 
     # Without credit card.
     bank_account_history = simulate_period(
@@ -124,7 +120,7 @@ def main():
     print(len(bank_account_history), bank_account_history)
 
     # With credit card.
-    credit_card = CreditCard(days_per_month)
+    credit_card = CreditCard(days_per_month, interest_free_period)
     bank_account_history_cc = simulate_period(
         initial_bank_account_balance, timeframe, days_per_month, pay, costs,
         credit_card, interest_rate)
