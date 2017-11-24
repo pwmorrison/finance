@@ -14,7 +14,7 @@ class CreditCard:
     https://www.nab.com.au/personal/learn/managing-your-debts/interest-free-periods
     """
 
-    def __init__(self, statement_period=30, interest_free_period=44):
+    def __init__(self, statement_period=30, interest_free_period=55):
         self.statement_period = statement_period
         self.interest_free_period = interest_free_period
         self.balance = 0
@@ -54,10 +54,11 @@ def simulate_period(
     costs_per_day = costs / days_per_month
     bank_account = initial_bank_account_balance
     bank_account_history = []
+
     for month in range(timeframe):
-        # Earn interest on the current account balance.
-        interest = (interest_rate / 12) * bank_account
-        bank_account += interest
+        # # Earn interest on the current account balance.
+        # interest = (interest_rate / 12) * bank_account
+        # bank_account += interest
         # Get paid, assuming we get paid at the start of the month.
         bank_account += pay
         if credit_card is not None:
@@ -65,6 +66,10 @@ def simulate_period(
             # Determine which day of this month to pay the credit card balance.
             due_date = credit_card.get_due_date()
         for day in range(days_per_month):
+            # Earn interest on the current account balance.
+            interest = (interest_rate / 365) * bank_account
+            bank_account += interest
+
             # Pay bills etc.
             if credit_card is not None:
                 # Use the credit card.
