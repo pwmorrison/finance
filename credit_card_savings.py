@@ -33,7 +33,7 @@ class CreditCard:
         self.balance -= amount
 
     def get_due_date(self):
-        return self.interest_free_period - self.statement_period
+        return max(self.interest_free_period - self.statement_period, 0)
 
 
 def simulate_period(
@@ -108,7 +108,7 @@ def main():
     pay = 5000  # per month
     costs = 4000  # per month
     interest_rate = 0.04  # 4%, currently common for home loans.
-    interest_free_period = 55
+    interest_free_period = 10
 
     # Without credit card.
     bank_account_history = simulate_period(
