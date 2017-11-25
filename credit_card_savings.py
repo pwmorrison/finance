@@ -18,19 +18,24 @@ class CreditCard:
         self.statement_period = statement_period
         self.interest_free_period = interest_free_period
         self.balance = 0
+        # The amount that we've already returned, to be paid.
+        self.amount_owing = 0
 
     def make_purchases(self, amount):
         self.balance += amount
 
     def new_month(self):
         # Return the amount and when to pay it.
-        return self.balance, self.get_due_date()
+        amount_to_pay = self.balance - self.amount_owing
+        self.amount_owing += amount_to_pay
+        return amount_to_pay, self.get_due_date()
 
     def get_balance(self):
         return self.balance
 
     def pay_amount(self, amount):
         self.balance -= amount
+        self.amount_owing -= amount
 
     def get_due_date(self):
         return max(self.interest_free_period - self.statement_period, 0)
@@ -45,6 +50,7 @@ def simulate_period(
     costs_per_day = costs / days_per_month
     bank_account = initial_bank_account_balance
     bank_account_history = []
+    credit_card_history = []
     pending_cc_payments = []
     for month in range(timeframe):
         # # Earn interest on the current account balance.
@@ -55,6 +61,7 @@ def simulate_period(
         if credit_card is not None:
             cc_next_pay_amount, cc_next_pay_day = credit_card.new_month()
             pending_cc_payments.append([cc_next_pay_amount, cc_next_pay_day])
+
         for day in range(days_per_month):
             # Earn interest on the current account balance.
             interest = (interest_rate / 365) * bank_account
@@ -77,12 +84,15 @@ def simulate_period(
                         amount_due = pending_cc_payment[0]
                         bank_account -= amount_due
                         credit_card.pay_amount(amount_due)
+                        print(month, day, amount_due)
                         pending_cc_payments.remove(pending_cc_payment)
                     else:
                         # We're 1 day closer to the due date.
                         pending_cc_payment[1] -= 1
 
             bank_account_history.append(bank_account)
+            if credit_card is not None:
+                credit_card_history.append(credit_card.get_balance())
 
     if credit_card is not None:
         # Make the final payment.
@@ -90,12 +100,13 @@ def simulate_period(
         bank_account -= balance
         credit_card.pay_amount(balance)
         bank_account_history.append(bank_account)
+        credit_card_history.append(credit_card.get_balance())
     else:
         # Make a corresponding entry, so the history lengths are equal
         # (for plotting).
         bank_account_history.append(bank_account_history[-1])
 
-    return bank_account_history
+    return bank_account_history, credit_card_history
 
 
 def main():
@@ -103,15 +114,15 @@ def main():
     On the credit card, we pay it off in full when due.
     """
     initial_bank_account_balance = 10000
-    timeframe = 3  # months
+    timeframe = 6  # months
     days_per_month = 30  # simplifying assumption
     pay = 5000  # per month
     costs = 4000  # per month
     interest_rate = 0.04  # 4%, currently common for home loans.
-    interest_free_period = 10
+    interest_free_period = 60
 
     # Without credit card.
-    bank_account_history = simulate_period(
+    bank_account_history, _ = simulate_period(
         initial_bank_account_balance, timeframe, days_per_month, pay, costs,
         None, interest_rate)
     print("Final bank account balance without credit card: %.2f" %
@@ -121,13 +132,14 @@ def main():
 
     # With credit card.
     credit_card = CreditCard(days_per_month, interest_free_period)
-    bank_account_history_cc = simulate_period(
+    bank_account_history_cc, credit_card_history_cc = simulate_period(
         initial_bank_account_balance, timeframe, days_per_month, pay, costs,
         credit_card, interest_rate)
     print("Final bank account balance with credit card: %.2f" %
           bank_account_history_cc[-1])
 
     print(len(bank_account_history_cc), bank_account_history_cc)
+    print("Credit card history", len(credit_card_history_cc), credit_card_history_cc)
 
     # Plot the bank account balances.
     fig, ax = plt.subplots()
@@ -139,6 +151,16 @@ def main():
     ax.set_xlabel("Day")
     ax.set_ylabel("Amount")
     ax.legend(loc='lower right')
+
+    # Plot the credit card balances.
+    fig, ax = plt.subplots()
+    x = range(len(credit_card_history_cc))
+    ax.plot(x, credit_card_history_cc, label="CC history")
+    ax.set_title("Credit card balance")
+    ax.set_xlabel("Day")
+    ax.set_ylabel("Amount")
+    # ax.legend(loc='lower right')
+
     plt.show()
 
 if __name__ == "__main__":
