@@ -23,6 +23,15 @@ def calculate_p_i_monthly_repayment(balance, interest_rate, loan_term_months):
     P = a / Z
     return P
 
+def calculate_io_monthly_repayment(balance, interest_rate):
+    # Calculate IO monthly repayments.
+    # https://www.moneygeek.com/personal-loans/calculate-loan-payments/
+    a = abs(balance)
+    r = interest_rate
+    n = 12
+    P = a * (r / n)
+    return P
+
 
 class Loan(Account):
     def __init__(self, name, initial_balance, interest_rate, monthly_repayment, withdraw_account):
@@ -58,7 +67,7 @@ class Loan2(Account):
     """
 
     # TODO:
-    def __init__(self, name, start_date, initial_balance, interest_rate, withdraw_account, loan_term_months, is_io, io_term):
+    def __init__(self, name, start_date, initial_balance, interest_rate, withdraw_account, loan_term_months, is_io, io_term_months):
         Account.__init__(self, initial_balance)
         self.name = name
         self.start_date = start_date
@@ -66,14 +75,18 @@ class Loan2(Account):
         self.withdraw_account = withdraw_account
         self.loan_term_months = loan_term_months
         self.is_io = is_io
-        self.io_term = io_term
+        self.io_term_months = io_term_months
+        self.num_months = 0
 
         # Calculate the monthly repayments.
         if is_io:
-            pass
+            self.io_monthly_repayment = calculate_io_monthly_repayment(self.balance, self.interest_rate)
+            self.pi_monthly_repayment = calculate_p_i_monthly_repayment(self.balance, self.interest_rate,
+                                                                        self.loan_term_months - self.io_term_months)
         else:
             # Principal and interest.
-            self.monthly_repayment = calculate_p_i_monthly_repayment(self.balance, self.interest_rate, self.loan_term_months)
+            self.io_monthly_repayment = None
+            self.pi_monthly_repayment = calculate_p_i_monthly_repayment(self.balance, self.interest_rate, self.loan_term_months)
 
         #self.monthly_repayment = monthly_repayment
 
@@ -83,7 +96,12 @@ class Loan2(Account):
         return self.name
 
     def get_monthly_repayment(self):
-        return self.monthly_repayment
+        if self.is_io and self.num_months < self.io_term_months:
+            # Switching from IO to P&I.
+            monthly_repayment = self.io_monthly_repayment
+        else:
+            monthly_repayment = self.pi_monthly_repayment
+        return monthly_repayment
 
     def process_transactions(self, current_date):
         """Process transactions at the end of the month.
@@ -93,17 +111,20 @@ class Loan2(Account):
 
         self.balance = round(self.balance, 2)
         balance = self.get_balance()
+        self.balance = round(self.balance, 2)
+
+        monthly_repayment = self.get_monthly_repayment()
 
         if balance < 0:
             # Deduct loan payment from loan account.
             # TODO: Should use max for negative numbers?
-            amount = min(self.monthly_repayment, -balance)
+            amount = min(monthly_repayment, -balance)
             amount = self.withdraw_account.withdraw(amount)
             self.deposit(amount)
 
-
-
         self.balance_history.append((current_date, self.balance))
+
+        self.num_months += 1
 
     def accrue_interest(self):
         interest = compute_monthly_interest(self.balance, self.interest_rate)
@@ -128,11 +149,17 @@ def test_loan2():
 
     if 1:
         savings_account = Savings(100000000, 0.0, monthly_investment_funds=0)
-        loan = Loan2("Loan", start_date, -500000, 0.05, withdraw_account=savings_account, loan_term_months=25*12,
-                     is_io=False, io_term=10*12)
+        if 0:
+            # P&I loan.
+            loan = Loan2("Loan", start_date, -500000, 0.05, withdraw_account=savings_account, loan_term_months=10*12,
+                         is_io=False, io_term_months=10*12)
+        else:
+            # IO loan.
+            loan = Loan2("Loan", start_date, -500000, 0.05, withdraw_account=savings_account, loan_term_months=10 * 12,
+                         is_io=True, io_term_months=1 * 12)
         accounts = [savings_account, loan]
 
-        print(f'Loan monthly repayment: {loan.monthly_repayment}')
+        print(f'Loan monthly repayment: {loan.get_monthly_repayment()}')
 
         current_date = start_date
         print(current_date, loan.balance)
