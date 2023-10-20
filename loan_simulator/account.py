@@ -31,7 +31,7 @@ class Account:
     def get_balance(self):
         return self.balance
 
-    def process_transactions(self):
+    def process_transactions(self, current_date):
         # Perform any monthly transactions required of this account.
         pass
 

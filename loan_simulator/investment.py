@@ -16,7 +16,10 @@ class Savings(Account):
     def determine_extra_monthly_investment_funds(self, repaid_loans):
         self.extra_monthly_investment_funds = sum(loan.get_monthly_repayment() for loan in repaid_loans)
 
-    def process_transactions(self):
+    def process_transactions(self, current_date):
+
+        self.accrue_interest()
+
         # TODO: Pay expenses (or consider this as another Account that withdraws from here).
         # Make additional loan payments with our monthly investment funds.
         if self.loan_to_repay is not None:
@@ -27,7 +30,8 @@ class Savings(Account):
                 amount = self.withdraw(amount)
                 self.loan_to_repay.deposit(amount)
 
+        self.balance_history.append(self.balance)
+
     def accrue_interest(self):
         interest = compute_monthly_interest(self.balance, self.interest_rate)
         self.balance += interest
-        self.balance_history.append(self.balance)
