@@ -31,6 +31,10 @@ class LoanSimulator {
   function theHTML($attributes) {
     if (!is_admin()) {
         wp_enqueue_script('d3-scripts', 'https://d3js.org/d3.v5.min.js');
+        wp_enqueue_script('account-scripts', plugin_dir_url(__FILE__) . 'build/account.js');
+        wp_enqueue_script('investment-scripts', plugin_dir_url(__FILE__) . 'build/investment.js');
+        wp_enqueue_script('loan-scripts', plugin_dir_url(__FILE__) . 'build/loan.js');
+        wp_enqueue_script('utils-scripts', plugin_dir_url(__FILE__) . 'build/utils.js');
         wp_enqueue_script('loanSimulatorFrontend', plugin_dir_url(__FILE__) . 'build/frontend.js', array('wp-element'), '1.0', true);
         //wp_enqueue_style('attentionFrontendStyle', plugin_dir_url(__FILE__) . 'build/frontend.css');
     }

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "wp-scripts build src/index.js src/frontend.js",
-    "start": "wp-scripts start src/index.js src/frontend.js",
+    "build": "wp-scripts build src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js",
+    "start": "wp-scripts start src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,5 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "@wordpress/scripts": "^26.15.0"
+  },
+  "dependencies": {
+    "d3": "^7.8.5"
   }
 }
