@@ -14,28 +14,19 @@ divsToUpdate.forEach(function(div) {
     div.classList.remove("loan-simulator-update-me")
 })
 
-function display_results() {
-    const data = [12, 5, 6, 6, 9, 10];
-    const svg = d3.select(".loan-simulator-frontend")
-        .append("svg")
-        .attr("width", 700)
-        .attr("height", 300);
-    svg.selectAll("rect")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("x", (d, i) => i * 70)
-        .attr("y", 0)
-        .attr("width", 65)
-        .attr("height", (d, i) => d)
-        .attr("fill", "green");
-}
+// TODO: Put these and all the functions in a class, so we don't need to store these globally.
+const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
+const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM;
+var x;
+var y;
+var xAxisGroup;
+var yAxisGroup;
+var g;
 
 
-function display_simulation_results() {
-    const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 }
-    const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT
-    const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM
+function setup_sim_vis() {
+    
 
     let flag = true
 
@@ -43,15 +34,15 @@ function display_simulation_results() {
         .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
         .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
 
-    const g = svg.append("g")
+    g = svg.append("g")
         .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
 
-    g.append("rect")
-        .attr("y", 0)
-        .attr("x", 0)
-        .attr("width", WIDTH)
-        .attr("height", HEIGHT)
-        .attr("fill", "grey")
+    // g.append("rect")
+    //     .attr("y", 0)
+    //     .attr("x", 0)
+    //     .attr("width", WIDTH)
+    //     .attr("height", HEIGHT)
+    //     .attr("fill", "grey")
 
     // X label
     g.append("text")
@@ -66,31 +57,36 @@ function display_simulation_results() {
     const yLabel = g.append("text")
         .attr("class", "y axis-label")
         .attr("x", - (HEIGHT / 2))
-        .attr("y", -10)
+        .attr("y", -30)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
         .attr("transform", "rotate(-90)")
         .text("Balance")
 
-    const x = d3.scaleBand()
+    x = d3.scaleBand()
         .range([0, WIDTH])
         .paddingInner(0.3)
         .paddingOuter(0.2)
 
-    const y = d3.scaleLinear()
+    y = d3.scaleLinear()
         .range([HEIGHT, 0])
 
-    const xAxisGroup = g.append("g")
+    xAxisGroup = g.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(0, ${HEIGHT})`)
 
-    const yAxisGroup = g.append("g")
+    yAxisGroup = g.append("g")
 
 }
 
 function update(data) {
-    x.domain(data.map(d => d.month))
-    y.domain([0, d3.max(data, d => d.revenue)])
+    x.domain(data.map(d => d[0]));
+    let max_y = d3.max(data, d => d[1]);
+    y.domain([0, d3.max(data, d => d[1])]);
+    //y.domain(data.map(d => d[1]));
+
+    let v = y(-1000);
+
   
     const xAxisCall = d3.axisBottom(x)
     xAxisGroup.call(xAxisCall)
@@ -105,22 +101,23 @@ function update(data) {
       .tickFormat(d => d + "m")
     yAxisGroup.call(yAxisCall)
   
-    // const rects = g.selectAll("rect")
-    //   .data(data)
+    const rects = g.selectAll("rect")
+      .data(data)
     
-    // rects.enter().append("rect")
-    //   .attr("y", d => y(d.revenue))
-    //   .attr("x", (d) => x(d.month))
-    //   .attr("width", x.bandwidth)
-    //   .attr("height", d => HEIGHT - y(d.revenue))
-    //   .attr("fill", "grey")
+    rects.enter().append("rect")
+      .attr("y", d => HEIGHT - y(d[1]))
+      .attr("x", (d) => x(d[0]))
+      .attr("width", x.bandwidth)
+      //.attr("height", d => y(d[1]))
+      .attr("height", 5)
+      .attr("fill", "grey")
   }
 
 function run_loan_simulator(msg) {
     let start_date = new Date("1/1/2000");
     console.log(start_date);
-    let savings_account = new Savings(100000000, 0.0, 0);
-    let loan = new Loan("Loan", start_date, -500000, 0.05, savings_account, 5*12, false, null);
+    let savings_account = new Savings(start_date, 100000000, 0.0, 0);
+    let loan = new Loan("Loan", start_date, -500000, 0.05, savings_account, 1*12, false, null);
     let accounts = [savings_account, loan];
 
     let current_date = start_date
@@ -149,9 +146,8 @@ function run_loan_simulator(msg) {
     console.log(loan_history);
     
     console.log(msg)
-    
-    //display_results();
-    display_simulation_results();
+
+    update(loan_history);
 }
 
 function Quiz(props) {
@@ -183,6 +179,9 @@ function Quiz(props) {
     const msg = "some message"
 
     const myFunc = useCallback(() => {
+        setup_sim_vis();
+        
+        // TODO: Call from button presses.
         run_loan_simulator(msg);
       }, [msg])
 

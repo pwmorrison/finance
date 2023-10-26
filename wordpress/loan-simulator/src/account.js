@@ -1,8 +1,10 @@
 
 export default class Account {
-    constructor(initial_balance){
-        this.balance = initial_balance
-        this.balance_history = [initial_balance]
+    constructor(start_date, initial_balance){
+        this.balance = initial_balance;
+        this.balance_history = [];
+        // TODO: Remove this negative. It's only there temporarily to display the graph.
+        this.balance_history.push([start_date, -initial_balance]);
     }
 
     deposit(amount) {

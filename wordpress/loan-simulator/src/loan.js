@@ -33,7 +33,7 @@ function calculate_io_monthly_repayment(balance, interest_rate) {
 
 export default class Loan extends Account {
     constructor(name, start_date, initial_balance, interest_rate, withdraw_account, loan_term_months, is_io, io_term_months) {
-        super(initial_balance);
+        super(start_date, initial_balance);
         this.name = name;
         this.start_date = start_date;
         this.interest_rate = interest_rate;
@@ -93,7 +93,8 @@ export default class Loan extends Account {
             this.deposit(amount)
         }
 
-        this.balance_history.push([current_date, this.balance])
+        // TODO: Remove this negative. It's only there temporarily to display the graph.
+        this.balance_history.push([current_date, -this.balance])
 
         this.num_months += 1
     }

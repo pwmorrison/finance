@@ -5,8 +5,8 @@ import Account from "./account";
 
 export default class Savings extends Account {
     
-    constructor(initial_balance, interest_rate, monthly_investment_funds) {
-        super(initial_balance);
+    constructor(start_date, initial_balance, interest_rate, monthly_investment_funds) {
+        super(start_date, initial_balance);
         this.initial_balance = initial_balance;
         this.interest_rate = interest_rate;
         this.monthly_investment_funds = monthly_investment_funds;
