@@ -108,8 +108,8 @@ function update(data) {
       .attr("y", d => HEIGHT - y(d[1]))
       .attr("x", (d) => x(d[0]))
       .attr("width", x.bandwidth)
-      //.attr("height", d => y(d[1]))
-      .attr("height", 5)
+      .attr("height", d => y(d[1]))
+      //.attr("height", 5)
       .attr("fill", "grey")
   }
 
