@@ -82,8 +82,11 @@ function setup_sim_vis() {
 function update(data) {
     x.domain(data.map(d => d[0]));
     let max_y = d3.max(data, d => d[1]);
-    y.domain([0, d3.max(data, d => d[1])]);
+    //y.domain([0, d3.max(data, d => d[1])]);
     //y.domain(data.map(d => d[1]));
+
+    // To handle negatives and positives, just map the data directly onto the axis.
+    y.domain(d3.extent(data, d => d[1]));
 
     let v = y(-1000);
 
@@ -104,12 +107,14 @@ function update(data) {
     const rects = g.selectAll("rect")
       .data(data)
     
+    // To deal with both positive and negative numbers, we either need to start each rectangle at the value (positive numbers), 
+    // or 0 (negative numbers). Whichever is closest to the top of the image.
     rects.enter().append("rect")
-      .attr("y", d => HEIGHT - y(d[1]))
+      .attr("y", d => Math.min(y(0), y(d[1])))
       .attr("x", (d) => x(d[0]))
       .attr("width", x.bandwidth)
-      .attr("height", d => y(d[1]))
-      //.attr("height", 5)
+      .attr("height", d => Math.abs(y(d[1]) - y(0)))
+      //.attr("height", 3)
       .attr("fill", "grey")
   }
 
