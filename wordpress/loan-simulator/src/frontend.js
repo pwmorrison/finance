@@ -118,11 +118,16 @@ function update(data) {
       .attr("fill", "grey")
   }
 
-function run_loan_simulator(msg) {
+function run_loan_simulator(loan_start_balance) {
+
+    if (loan_start_balance > 0) {
+        loan_start_balance = -loan_start_balance;
+    }
+
     let start_date = new Date("1/1/2000");
     console.log(start_date);
     let savings_account = new Savings(start_date, 100000000, 0.0, 0);
-    let loan = new Loan("Loan", start_date, -500000, 0.05, savings_account, 1*12, false, null);
+    let loan = new Loan("Loan", start_date, loan_start_balance, 0.05, savings_account, 1*12, false, null);
     let accounts = [savings_account, loan];
 
     let current_date = start_date
@@ -149,8 +154,6 @@ function run_loan_simulator(msg) {
     }
     let loan_history = loan.balance_history;
     console.log(loan_history);
-    
-    console.log(msg)
 
     update(loan_history);
 }
@@ -158,6 +161,8 @@ function run_loan_simulator(msg) {
 function Quiz(props) {
     const [isCorrect, setIsCorrect] = useState(undefined)
     const [isCorrectDelayed, setIsCorrectDelayed] = useState(undefined)
+
+    const [loanStartBalance, setLoanStartBalance] = useState(undefined)
 
     useEffect(() => {
         if (isCorrect === false) {
@@ -197,7 +202,8 @@ function Quiz(props) {
     return (
         <div className="loan-simulator-frontend">
             <p>Loan Simulator React</p>
-            <button onClick={() => run_loan_simulator(msg)}>Run simulation</button>
+            <input type="number" value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
+            <button onClick={() => run_loan_simulator(loanStartBalance)}>Run simulation</button>
         </div>
     )
 }
