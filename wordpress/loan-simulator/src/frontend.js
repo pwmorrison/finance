@@ -16,8 +16,8 @@ divsToUpdate.forEach(function(div) {
 
 // TODO: Put these and all the functions in a class, so we don't need to store these globally.
 const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
-const WIDTH = 600 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 400 - MARGIN.TOP - MARGIN.BOTTOM;
+const WIDTH = 1000 - MARGIN.LEFT - MARGIN.RIGHT;
+const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
 var x;
 var y;
 var xAxisGroup;
@@ -44,6 +44,8 @@ function setup_sim_vis() {
     //     .attr("height", HEIGHT)
     //     .attr("fill", "grey")
 
+    //var formatTime = d3.timeFormat("%d %B, %Y")
+
     // X label
     g.append("text")
         .attr("class", "x axis-label")
@@ -51,7 +53,7 @@ function setup_sim_vis() {
         .attr("y", HEIGHT + 60)
         .attr("font-size", "20px")
         .attr("text-anchor", "middle")
-        .text("Month")
+        //.text("Month")
 
     // Y label
     const yLabel = g.append("text")
@@ -73,7 +75,7 @@ function setup_sim_vis() {
 
     xAxisGroup = g.append("g")
         .attr("class", "x axis")
-        .attr("transform", `translate(0, ${HEIGHT})`)
+        //.attr("transform", `translate(0, ${HEIGHT})`)
 
     yAxisGroup = g.append("g")
 
@@ -81,27 +83,25 @@ function setup_sim_vis() {
 
 function update(data) {
     x.domain(data.map(d => d[0]));
-    let max_y = d3.max(data, d => d[1]);
-    //y.domain([0, d3.max(data, d => d[1])]);
-    //y.domain(data.map(d => d[1]));
-
     // To handle negatives and positives, just map the data directly onto the axis.
     y.domain(d3.extent(data, d => d[1]));
 
-    let v = y(-1000);
-
+    xAxisGroup.attr("transform", `translate(0, ${y(0)})`)
+        //.attr("transform", `translate(0, ${HEIGHT})`)
   
     const xAxisCall = d3.axisBottom(x)
+        .tickFormat(d3.timeFormat("%d %B, %Y"));
     xAxisGroup.call(xAxisCall)
-      .selectAll("text")
+        .selectAll("text")
         .attr("y", "10")
         .attr("x", "-5")
         .attr("text-anchor", "end")
         .attr("transform", "rotate(-40)")
-  
+    
     const yAxisCall = d3.axisLeft(y)
-      .ticks(3)
-      .tickFormat(d => d + "m")
+      //.ticks(3)
+      //.tickFormat(d => d + "m")
+      //.tickFormat(d3.timeFormat("%d %B, %Y"));
     yAxisGroup.call(yAxisCall)
   
     const rects = g.selectAll("rect")
@@ -187,7 +187,7 @@ function Quiz(props) {
         setup_sim_vis();
         
         // TODO: Call from button presses.
-        run_loan_simulator(msg);
+        //run_loan_simulator(msg);
       }, [msg])
 
       useEffect(() => {
@@ -197,6 +197,7 @@ function Quiz(props) {
     return (
         <div className="loan-simulator-frontend">
             <p>Loan Simulator React</p>
+            <button onClick={() => run_loan_simulator(msg)}>Run simulation</button>
         </div>
     )
 }

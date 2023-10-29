@@ -94,7 +94,7 @@ export default class Loan extends Account {
         }
 
         // TODO: Remove this negative. It's only there temporarily to display the graph.
-        this.balance_history.push([current_date, this.balance])
+        this.balance_history.push([current_date, -this.balance])
 
         this.num_months += 1
     }
