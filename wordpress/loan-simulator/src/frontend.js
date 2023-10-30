@@ -14,21 +14,21 @@ divsToUpdate.forEach(function(div) {
     div.classList.remove("loan-simulator-update-me")
 })
 
-// TODO: Put these and all the functions in a class, so we don't need to store these globally.
-const MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
-const WIDTH = 1000 - MARGIN.LEFT - MARGIN.RIGHT;
-const HEIGHT = 800 - MARGIN.TOP - MARGIN.BOTTOM;
-var x;
-var y;
-var xAxisGroup;
-var yAxisGroup;
-var g;
+
 
 
 class LoanSimulator {
 
     constructor() {
-
+        // TODO: Put these and all the functions in a class, so we don't need to store these globally.
+        this.MARGIN = { LEFT: 100, RIGHT: 10, TOP: 10, BOTTOM: 100 };
+        this.WIDTH = 1000 - this.MARGIN.LEFT - this.MARGIN.RIGHT;
+        this.HEIGHT = 800 - this.MARGIN.TOP - this.MARGIN.BOTTOM;
+        this.x;
+        this.y;
+        this.xAxisGroup;
+        this.yAxisGroup;
+        this.g;
     }
 
 
@@ -38,11 +38,11 @@ class LoanSimulator {
         let flag = true
 
         const svg = d3.select("#chart-area").append("svg")
-            .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
-            .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
+            .attr("width", this.WIDTH + this.MARGIN.LEFT + this.MARGIN.RIGHT)
+            .attr("height", this.HEIGHT + this.MARGIN.TOP + this.MARGIN.BOTTOM)
 
-        g = svg.append("g")
-            .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`)
+        this.g = svg.append("g")
+            .attr("transform", `translate(${this.MARGIN.LEFT}, ${this.MARGIN.TOP})`)
 
         // g.append("rect")
         //     .attr("y", 0)
@@ -54,75 +54,75 @@ class LoanSimulator {
         //var formatTime = d3.timeFormat("%d %B, %Y")
 
         // X label
-        g.append("text")
+        this.g.append("text")
             .attr("class", "x axis-label")
-            .attr("x", WIDTH / 2)
-            .attr("y", HEIGHT + 60)
+            .attr("x", this.WIDTH / 2)
+            .attr("y", this.HEIGHT + 60)
             .attr("font-size", "20px")
             .attr("text-anchor", "middle")
             //.text("Month")
 
         // Y label
-        const yLabel = g.append("text")
+        const yLabel = this.g.append("text")
             .attr("class", "y axis-label")
-            .attr("x", - (HEIGHT / 2))
+            .attr("x", - (this.HEIGHT / 2))
             .attr("y", -30)
             .attr("font-size", "20px")
             .attr("text-anchor", "middle")
             .attr("transform", "rotate(-90)")
             .text("Balance")
 
-        x = d3.scaleBand()
-            .range([0, WIDTH])
+        this.x = d3.scaleBand()
+            .range([0, this.WIDTH])
             .paddingInner(0.3)
             .paddingOuter(0.2)
 
-        y = d3.scaleLinear()
-            .range([HEIGHT, 0])
+        this.y = d3.scaleLinear()
+            .range([this.HEIGHT, 0])
 
-        xAxisGroup = g.append("g")
+        this.xAxisGroup = this.g.append("g")
             .attr("class", "x axis")
             //.attr("transform", `translate(0, ${HEIGHT})`)
 
-        yAxisGroup = g.append("g")
+        this.yAxisGroup = this.g.append("g")
 
     }
 
     update(data) {
-        x.domain(data.map(d => d[0]));
+        this.x.domain(data.map(d => d[0]));
         // To handle negatives and positives, just map the data directly onto the axis.
-        y.domain(d3.extent(data, d => d[1]));
+        this.y.domain(d3.extent(data, d => d[1]));
 
-        xAxisGroup.attr("transform", `translate(0, ${y(0)})`)
+        this.xAxisGroup.attr("transform", `translate(0, ${this.y(0)})`)
             //.attr("transform", `translate(0, ${HEIGHT})`)
     
-        const xAxisCall = d3.axisBottom(x)
+        const xAxisCall = d3.axisBottom(this.x)
             .tickFormat(d3.timeFormat("%d %B, %Y"));
-        xAxisGroup.call(xAxisCall)
+        this.xAxisGroup.call(xAxisCall)
             .selectAll("text")
             .attr("y", "10")
             .attr("x", "-5")
             .attr("text-anchor", "end")
             .attr("transform", "rotate(-40)")
         
-        const yAxisCall = d3.axisLeft(y)
+        const yAxisCall = d3.axisLeft(this.y)
         //.ticks(3)
         //.tickFormat(d => d + "m")
         //.tickFormat(d3.timeFormat("%d %B, %Y"));
-        yAxisGroup.call(yAxisCall)
+        this.yAxisGroup.call(yAxisCall)
     
-        const rects = g.selectAll("rect")
-        .data(data)
+        const rects = this.g.selectAll("rect")
+            .data(data)
         
         // To deal with both positive and negative numbers, we either need to start each rectangle at the value (positive numbers), 
         // or 0 (negative numbers). Whichever is closest to the top of the image.
         rects.enter().append("rect")
-        .attr("y", d => Math.min(y(0), y(d[1])))
-        .attr("x", (d) => x(d[0]))
-        .attr("width", x.bandwidth)
-        .attr("height", d => Math.abs(y(d[1]) - y(0)))
-        //.attr("height", 3)
-        .attr("fill", "grey")
+            .attr("y", d => Math.min(this.y(0), this.y(d[1])))
+            .attr("x", (d) => this.x(d[0]))
+            .attr("width", this.x.bandwidth)
+            .attr("height", d => Math.abs(this.y(d[1]) - this.y(0)))
+            //.attr("height", 3)
+            .attr("fill", "grey")
     }
 
     run_loan_simulator(loan_start_balance) {
