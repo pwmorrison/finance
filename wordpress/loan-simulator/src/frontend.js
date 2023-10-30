@@ -30,7 +30,7 @@ function setup_sim_vis() {
 
     let flag = true
 
-    const svg = d3.select(".loan-simulator-frontend").append("svg")
+    const svg = d3.select("#chart-area").append("svg")
         .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
         .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
 
@@ -190,9 +190,6 @@ function Quiz(props) {
 
     const myFunc = useCallback(() => {
         setup_sim_vis();
-        
-        // TODO: Call from button presses.
-        //run_loan_simulator(msg);
       }, [msg])
 
       useEffect(() => {
@@ -204,6 +201,8 @@ function Quiz(props) {
             <p>Loan Simulator React</p>
             <input type="number" value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
             <button onClick={() => run_loan_simulator(loanStartBalance)}>Run simulation</button>
+            <div id="chart-area">
+            </div>
         </div>
     )
 }
