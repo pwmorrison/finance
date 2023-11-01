@@ -266,44 +266,43 @@ function Quiz(props) {
         <div className="loan-simulator-frontend">
             <p>Loan Simulator React</p>
             <form>
-                <div class="form-group">
-                    <label for="startBalance">Start Balance</label>
-                    <input type="number" class="form-control" id="startBalance" placeholder="Enter start balance"
-                    value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <div class="form-group">
+                                <label for="startBalance">Start Balance</label>
+                                <input type="number" class="form-control" id="startBalance" placeholder="Enter start balance"
+                                value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
+                            </div>
+                            <div class="form-group">
+                                <label for="interestRate">Interest Rate (%)</label>
+                                <input type="number" class="form-control" id="interestRate" placeholder="Interest rate"
+                                value={interestRate} onChange={(b) => setInterestRate(Number(b.target.value))}/>
+                            </div>
+                            <div class="form-group">
+                                <label for="repaymentFrequency">Repayment Frequency</label>
+                                <select class="form-control" id="repaymentFrequency">
+                                    <option>Monthly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="loanLength">Length of Loan (months)</label>
+                                <input type="number" class="form-control" id="loanLength" placeholder="12"
+                                value={loanLength} onChange={(b) => setLoanLength(Number(b.target.value))}/>
+                            </div>
+                            <button class="btn btn-primary" onClick={handleRunSimulation}>Run Simulation</button>
+                        </div>
+                        <div class="col-sm">
+                        One of three columns
+                        </div>
+                        <div class="col-sm">
+                        One of three columns
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="interestRate">Interest Rate (%)</label>
-                    <input type="number" class="form-control" id="interestRate" placeholder="Interest rate"
-                    value={interestRate} onChange={(b) => setInterestRate(Number(b.target.value))}/>
-                </div>
-                <div class="form-group">
-                    <label for="repaymentFrequency">Repayment Frequency</label>
-                    <select class="form-control" id="repaymentFrequency">
-                        <option>Monthly</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="loanLength">Length of Loan (months)</label>
-                    <input type="number" class="form-control" id="loanLength" placeholder="12"
-                    value={loanLength} onChange={(b) => setLoanLength(Number(b.target.value))}/>
-                </div>
-                <button class="btn btn-primary" onClick={handleRunSimulation}>Run Simulation</button>
             </form>
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm">
-                    One of three columns
-                    </div>
-                    <div class="col-sm">
-                    One of three columns
-                    </div>
-                    <div class="col-sm">
-                    One of three columns
-                    </div>
-                </div>
-            </div>
-            <input type="number" value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
-            <button onClick={() => loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength)}>Run simulation</button>
+            {/* <input type="number" value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/> */}
+            {/* <button onClick={() => loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength)}>Run simulation</button> */}
             {/* <Button class="btn btn-primary" onClick={() => loanSimulator.run_loan_simulator(loanStartBalance)}>Run!</Button> */}
             <div id="chart-area">
             </div>
