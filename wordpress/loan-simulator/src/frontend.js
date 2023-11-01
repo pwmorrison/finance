@@ -5,6 +5,14 @@ import * as d3 from "d3";
 import "./frontend.scss"
 import Savings from './investment'
 import Loan from './loan'
+//import Button from 'react-bootstrap/Button';
+//import Container from 'react-bootstrap/Container'
+//import Row from 'react-bootstrap/Row'
+//import Col from 'react-bootstrap/Col'
+//import Form from 'react-bootstrap/Form';
+//import Card from 'react-bootstrap/Card'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const divsToUpdate = document.querySelectorAll(".loan-simulator-update-me")
 
@@ -15,6 +23,26 @@ divsToUpdate.forEach(function(div) {
 })
 
 
+/*
+The loan calculator that doesn't suck.
+
+Features:
+* Display all data - loan balance, repayments divided by total/interest/principal, accumulated interest paid, accumulated principal paid.
+* Display totals - montly repayments in and outside the IO period, total repayments, total interest paid, time to completion, time saved.
+* Extra repayments, including recurring and one-off.
+* Linked offset account with monthly income, expenses and one-off inputs/outputs.
+* Compare different scenarios: IO terms, P&I, variations of the above features.
+* Provide link so the user can come back to their results and make changes.
+* Download results data.
+*/
+
+/*
+What should the UI look like?
+A pane per scenario.
+For each pane, have options along the top, and results graphs below.
+If multiple scenarios, do a comparison down the bottom.
+Start with simple options, and have the advanced options available if selected.
+*/
 
 
 class LoanSimulator {
@@ -125,7 +153,7 @@ class LoanSimulator {
             .attr("fill", "grey")
     }
 
-    run_loan_simulator(loan_start_balance) {
+    run_loan_simulator(loan_start_balance, interest_rate, loan_length) {
 
         if (loan_start_balance > 0) {
             loan_start_balance = -loan_start_balance;
@@ -134,7 +162,7 @@ class LoanSimulator {
         let start_date = new Date("1/1/2000");
         console.log(start_date);
         let savings_account = new Savings(start_date, 100000000, 0.0, 0);
-        let loan = new Loan("Loan", start_date, loan_start_balance, 0.05, savings_account, 1*12, false, null);
+        let loan = new Loan("Loan", start_date, loan_start_balance, interest_rate, savings_account, loan_length, false, null);
         let accounts = [savings_account, loan];
 
         let current_date = start_date
@@ -171,7 +199,9 @@ function Quiz(props) {
     const [isCorrect, setIsCorrect] = useState(undefined)
     const [isCorrectDelayed, setIsCorrectDelayed] = useState(undefined)
 
-    const [loanStartBalance, setLoanStartBalance] = useState(undefined)
+    const [loanStartBalance, setLoanStartBalance] = useState(1000000)
+    const [interestRate, setInterestRate] = useState(0.05)
+    const [loanLength, setLoanLength] = useState(12 * 1)
 
     const [loanSimulator, setLoanSimulator] = useState(undefined)
 
@@ -197,6 +227,11 @@ function Quiz(props) {
         }
     }
 
+    function handleRunSimulation(event) {
+        event.preventDefault();  // Stop the browser refreshing on form submit.
+        loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength);
+    }
+
     const msg = "some message"
 
     const myFunc = useCallback(() => {
@@ -214,8 +249,46 @@ function Quiz(props) {
     return (
         <div className="loan-simulator-frontend">
             <p>Loan Simulator React</p>
+            <form>
+                <div class="form-group">
+                    <label for="startBalance">Start Balance</label>
+                    <input type="number" class="form-control" id="startBalance" placeholder="Enter start balance"
+                    value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
+                </div>
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate (%)</label>
+                    <input type="number" class="form-control" id="interestRate" placeholder="Interest rate"
+                    value={interestRate} onChange={(b) => setInterestRate(Number(b.target.value))}/>
+                </div>
+                <div class="form-group">
+                    <label for="repaymentFrequency">Repayment Frequency</label>
+                    <select class="form-control" id="repaymentFrequency">
+                        <option>Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="loanLength">Length of Loan (months)</label>
+                    <input type="number" class="form-control" id="loanLength" placeholder="12"
+                    value={loanLength} onChange={(b) => setLoanLength(Number(b.target.value))}/>
+                </div>
+                <button class="btn btn-primary" onClick={handleRunSimulation}>Run Simulation</button>
+            </form>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                    One of three columns
+                    </div>
+                    <div class="col-sm">
+                    One of three columns
+                    </div>
+                    <div class="col-sm">
+                    One of three columns
+                    </div>
+                </div>
+            </div>
             <input type="number" value={loanStartBalance} onChange={(b) => setLoanStartBalance(Number(b.target.value))}/>
-            <button onClick={() => loanSimulator.run_loan_simulator(loanStartBalance)}>Run simulation</button>
+            <button onClick={() => loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength)}>Run simulation</button>
+            {/* <Button class="btn btn-primary" onClick={() => loanSimulator.run_loan_simulator(loanStartBalance)}>Run!</Button> */}
             <div id="chart-area">
             </div>
         </div>
