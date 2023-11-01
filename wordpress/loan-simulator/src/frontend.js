@@ -117,6 +117,8 @@ class LoanSimulator {
     }
 
     update(data) {
+        const t = d3.transition().duration(750)
+
         this.x.domain(data.map(d => d[0]));
         // To handle negatives and positives, just map the data directly onto the axis.
         this.y.domain(d3.extent(data, d => d[1]));
@@ -141,16 +143,30 @@ class LoanSimulator {
     
         const rects = this.g.selectAll("rect")
             .data(data)
-        
+
+        rects.exit().remove()
+
+        rects.enter().append("rect")
+            .attr("fill", "grey")
+            .attr("y", this.y(0))
+            .attr("height", 0)
+            // AND UPDATE old elements present in new data.
+            .merge(rects)
+            .transition(t)
+                .attr("x", (d) => this.x(d[0]))
+                .attr("width", this.x.bandwidth)
+                .attr("y", d => Math.min(this.y(0), this.y(d[1])))
+                .attr("height", d => Math.abs(this.y(d[1]) - this.y(0)))
+
         // To deal with both positive and negative numbers, we either need to start each rectangle at the value (positive numbers), 
         // or 0 (negative numbers). Whichever is closest to the top of the image.
-        rects.enter().append("rect")
-            .attr("y", d => Math.min(this.y(0), this.y(d[1])))
-            .attr("x", (d) => this.x(d[0]))
-            .attr("width", this.x.bandwidth)
-            .attr("height", d => Math.abs(this.y(d[1]) - this.y(0)))
-            //.attr("height", 3)
-            .attr("fill", "grey")
+        // rects.enter().append("rect")
+        //     .attr("y", d => Math.min(this.y(0), this.y(d[1])))
+        //     .attr("x", (d) => this.x(d[0]))
+        //     .attr("width", this.x.bandwidth)
+        //     .attr("height", d => Math.abs(this.y(d[1]) - this.y(0)))
+        //     //.attr("height", 3)
+        //     .attr("fill", "grey")
     }
 
     run_loan_simulator(loan_start_balance, interest_rate, loan_length) {
