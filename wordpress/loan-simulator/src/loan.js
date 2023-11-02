@@ -45,6 +45,17 @@ export default class Loan extends Account {
         //this.balance = initial_balance;
         //this.balance_history = [];
 
+        console.log("IO: " + is_io + " " + io_term_months);
+
+        this.balance_history.push([start_date, -initial_balance]);
+
+        // date, total repayment, interest repayment, principal repayment.
+        this.repayment_history = [];
+
+        this.total_repayments = 0;
+        this.total_interest_paid = 0;
+        this.total_principal_paid = 0;
+
         console.log('Start balance: ' + this.balance);
 
         // Calculate the monthly repayments.
@@ -61,9 +72,8 @@ export default class Loan extends Account {
     get_monthly_repayment() {
         let monthly_repayment;
         if (this.is_io && this.num_months < this.io_term_months) {
-            // Switching from IO to P&I.
+            // Within the IO period.
             monthly_repayment = this.io_monthly_repayment;
-
         } else {
             monthly_repayment = this.pi_monthly_repayment;
         }
@@ -73,7 +83,7 @@ export default class Loan extends Account {
     process_transactions(current_date) {
         //Process transactions at the end of the month.
         // First accrue interest incurred over the month.
-        this.accrue_interest()
+        let accrued_interest = this.accrue_interest()
 
         console.log('Current date: ' + current_date);
 
@@ -82,8 +92,11 @@ export default class Loan extends Account {
         //this.balance = round(this.balance, 2)
         console.log('Current balance: ' + balance);
 
-        let monthly_repayment = this.get_monthly_repayment()
-        console.log('Monthly repayment: ' + monthly_repayment);
+        let monthly_repayment = this.get_monthly_repayment();
+        //let monthly_repayment = repayments[0];
+        let interest_repayment = accrued_interest;//repayments[1];
+        let principal_repayment = monthly_repayment - Math.abs(accrued_interest);//repayments[2];
+        console.log('Repayments (monthly, interest, principal): ' + monthly_repayment + ', ' + interest_repayment + ', ' + principal_repayment);
 
         if (balance < 0) {
             // Deduct loan payment from loan account.
@@ -97,6 +110,12 @@ export default class Loan extends Account {
         this.balance_history.push([current_date, -this.balance])
 
         this.num_months += 1
+
+        this.total_repayments += monthly_repayment;
+        this.total_interest_paid += interest_repayment;
+        this.total_principal_paid += principal_repayment;
+
+        console.log('Totals (monthly, interest, principal): ' + this.total_repayments + ', ' + this.total_interest_paid + ', ' + this.total_principal_paid);
     }
 
     accrue_interest() {
@@ -104,6 +123,7 @@ export default class Loan extends Account {
         console.log('Balance before accruing interest: ' + this.balance);
         console.log('Accruing interest: ' + interest);
         this.balance += interest
+        return interest;
         //self.balance_history.append(self.balance)
     }
 

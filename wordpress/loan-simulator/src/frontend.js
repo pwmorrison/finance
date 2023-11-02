@@ -169,7 +169,7 @@ class LoanSimulator {
         //     .attr("fill", "grey")
     }
 
-    run_loan_simulator(loan_start_balance, interest_rate, loan_length) {
+    run_loan_simulator(loan_start_balance, interest_rate, loan_length, interest_only, interest_only_period) {
 
         if (loan_start_balance > 0) {
             loan_start_balance = -loan_start_balance;
@@ -178,7 +178,7 @@ class LoanSimulator {
         let start_date = new Date("1/1/2000");
         console.log(start_date);
         let savings_account = new Savings(start_date, 100000000, 0.0, 0);
-        let loan = new Loan("Loan", start_date, loan_start_balance, interest_rate, savings_account, loan_length, false, null);
+        let loan = new Loan("Loan", start_date, loan_start_balance, interest_rate, savings_account, loan_length, interest_only, interest_only_period);
         let accounts = [savings_account, loan];
 
         let current_date = start_date
@@ -218,6 +218,8 @@ function Quiz(props) {
     const [loanStartBalance, setLoanStartBalance] = useState(1000000)
     const [interestRate, setInterestRate] = useState(0.05)
     const [loanLength, setLoanLength] = useState(12 * 1)
+    const [interestOnly, setInterestOnly] = useState(false)
+    const [interestOnlyPeriod, setInterestOnlyPeriod] = useState(3)
 
     const [loanSimulator, setLoanSimulator] = useState(undefined)
 
@@ -245,7 +247,7 @@ function Quiz(props) {
 
     function handleRunSimulation(event) {
         event.preventDefault();  // Stop the browser refreshing on form submit.
-        loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength);
+        loanSimulator.run_loan_simulator(loanStartBalance, interestRate, loanLength, interestOnly, interestOnlyPeriod);
     }
 
     const msg = "some message"
@@ -289,6 +291,18 @@ function Quiz(props) {
                                 <label for="loanLength">Length of Loan (months)</label>
                                 <input type="number" class="form-control" id="loanLength" placeholder="12"
                                 value={loanLength} onChange={(b) => setLoanLength(Number(b.target.value))}/>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value={interestOnly} id="interestOnly"
+                                onChange={(b) => setInterestOnly(Boolean(b.target.value))}/>
+                                <label class="form-check-label" for="interestOnly">
+                                    Interest Only
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="interestOnlyPeriod">Interest Only Period</label>
+                                <input type="number" class="form-control" id="interestOnlyPeriod" placeholder="3"
+                                value={interestOnlyPeriod} onChange={(b) => setInterestOnlyPeriod(Number(b.target.value))}/>
                             </div>
                             <button class="btn btn-primary" onClick={handleRunSimulation}>Run Simulation</button>
                         </div>
