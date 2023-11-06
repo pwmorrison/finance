@@ -47,7 +47,10 @@ export default class Loan extends Account {
 
         console.log("IO period: " + io_term_months);
 
-        this.balance_history.push([start_date, -initial_balance]);
+        this.balance_history.push({
+            "date": start_date,  
+            "balance": -initial_balance
+        });
 
         // date, total repayment, interest repayment, principal repayment.
         this.repayment_history = [];
@@ -107,7 +110,10 @@ export default class Loan extends Account {
         }
 
         // TODO: Remove this negative. It's only there temporarily to display the graph.
-        this.balance_history.push([current_date, -this.balance])
+        this.balance_history.push({
+            "date": current_date, 
+            "balance": -this.balance
+        })
 
         this.num_months += 1
 

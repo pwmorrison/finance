@@ -166,8 +166,8 @@ function Quiz(props) {
         <div id="chart-area">
         </div>
         <div id="slider-div">
-            <label>Date: <span id="dateLabel1">12/05/2013</span> - <span id="dateLabel2">31/10/2017</span></label>
-            <div id="date-slider"></div>
+          <label>Date: <span id="dateLabel1">12/05/2013</span> - <span id="dateLabel2">31/10/2017</span></label>
+          <div id="date-slider"></div>
         </div>
         <div id="chart-area-2">
         </div>

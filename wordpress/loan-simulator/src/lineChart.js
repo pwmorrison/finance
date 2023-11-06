@@ -32,7 +32,7 @@ export default class LineChart {
 		vis.parseTime = d3.timeParse("%d/%m/%Y")
 		vis.formatTime = d3.timeFormat("%d/%m/%Y")
 		// for tooltip
-		vis.bisectDate = d3.bisector(d => d[0]).left
+		vis.bisectDate = d3.bisector(d => d["date"]).left
 		
 		// add the line for the first time
 		vis.g.append("path")
@@ -90,7 +90,7 @@ export default class LineChart {
 		// 	return ((d.date >= vis.sliderValues[0]) && (d.date <= vis.sliderValues[1]))
 		// })
 
-        vis.dataTimeFiltered = data
+    vis.dataTimeFiltered = data
 		vis.updateVis()
 	}
 
@@ -100,13 +100,13 @@ export default class LineChart {
 
 		vis.t = d3.transition().duration(1000)
 
-        console.log("dataTimeFiltered: " + vis.dataTimeFiltered);
+    console.log("dataTimeFiltered: " + vis.dataTimeFiltered);
 
 		// update scales
-		vis.x.domain(d3.extent(vis.dataTimeFiltered, d => d[0]))
+		vis.x.domain(d3.extent(vis.dataTimeFiltered, d => d["date"]))
 		vis.y.domain([
-			d3.min(vis.dataTimeFiltered, d => d[1]) / 1.005, 
-			d3.max(vis.dataTimeFiltered, d => d[1]) * 1.005
+			d3.min(vis.dataTimeFiltered, d => d["balance"]) / 1.005, 
+			d3.max(vis.dataTimeFiltered, d => d["balance"]) * 1.005
 		])
 	
 		// fix for format values
@@ -167,11 +167,11 @@ export default class LineChart {
                 const i = vis.bisectDate(vis.dataTimeFiltered, x0, 1)
                 const d0 = vis.dataTimeFiltered[i - 1]
                 const d1 = vis.dataTimeFiltered[i]
-                const d = x0 - d0[0] > d1[0] - x0 ? d1 : d0
-                vis.focus.attr("transform", `translate(${vis.x(d[0])}, ${vis.y(d[1])})`)
-                vis.focus.select("text").text(d[1])
-                vis.focus.select(".x-hover-line").attr("y2", vis.HEIGHT - vis.y(d[1]))
-                vis.focus.select(".y-hover-line").attr("x2", -vis.x(d[0]))
+                const d = x0 - d0["date"] > d1["date"] - x0 ? d1 : d0
+                vis.focus.attr("transform", `translate(${vis.x(d["date"])}, ${vis.y(d["balance"])})`)
+                vis.focus.select("text").text(d["balance"])
+                vis.focus.select(".x-hover-line").attr("y2", vis.HEIGHT - vis.y(d["balance"]))
+                vis.focus.select(".y-hover-line").attr("x2", -vis.x(d["date"]))
             }
         }
 		
@@ -179,8 +179,8 @@ export default class LineChart {
 	
 		// Path generator
 		vis.line = d3.line()
-			.x(d => vis.x(d[0]))
-			.y(d => vis.y(d[1]))
+			.x(d => vis.x(d["date"]))
+			.y(d => vis.y(d["balance"]))
 	
 		// Update our line path
 		vis.g.select(".line")
