@@ -32,20 +32,20 @@ function calculate_io_monthly_repayment(balance, interest_rate) {
 
 
 export default class Loan extends Account {
-    constructor(name, start_date, initial_balance, interest_rate, withdraw_account, loan_term_months, is_io, io_term_months) {
+    constructor(name, start_date, initial_balance, interest_rate, withdraw_account, loan_term_months, io_term_months) {
         super(start_date, initial_balance);
         this.name = name;
         this.start_date = start_date;
         this.interest_rate = interest_rate;
         this.withdraw_account = withdraw_account;
         this.loan_term_months = loan_term_months;
-        this.is_io = is_io;
+        this.is_io = io_term_months > 0;
         this.io_term_months = io_term_months;
         this.num_months = 0;
         //this.balance = initial_balance;
         //this.balance_history = [];
 
-        console.log("IO: " + is_io + " " + io_term_months);
+        console.log("IO period: " + io_term_months);
 
         this.balance_history.push([start_date, -initial_balance]);
 
@@ -59,7 +59,7 @@ export default class Loan extends Account {
         console.log('Start balance: ' + this.balance);
 
         // Calculate the monthly repayments.
-        if (is_io) {
+        if (this.is_io) {
             this.io_monthly_repayment = calculate_io_monthly_repayment(this.balance, this.interest_rate);
             this.pi_monthly_repayment = calculate_p_i_monthly_repayment(this.balance, this.interest_rate,
                                                                         this.loan_term_months - this.io_term_months);
