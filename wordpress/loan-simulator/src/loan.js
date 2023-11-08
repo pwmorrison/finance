@@ -49,7 +49,8 @@ export default class Loan extends Account {
 
         this.balance_history.push({
             "date": start_date,  
-            "balance": -initial_balance
+            "balance": -initial_balance,
+            "payment": 0
         });
 
         // date, total repayment, interest repayment, principal repayment.
@@ -101,18 +102,20 @@ export default class Loan extends Account {
         let principal_repayment = monthly_repayment - Math.abs(accrued_interest);//repayments[2];
         console.log('Repayments (monthly, interest, principal): ' + monthly_repayment + ', ' + interest_repayment + ', ' + principal_repayment);
 
+        let payment = 0;
         if (balance < 0) {
             // Deduct loan payment from loan account.
             // TODO: Should use max for negative numbers?
-            let amount = Math.min(monthly_repayment, -balance)
-            amount = this.withdraw_account.withdraw(amount)
-            this.deposit(amount)
+            payment = Math.min(monthly_repayment, -balance)
+            payment = this.withdraw_account.withdraw(payment)
+            this.deposit(payment)
         }
 
         // TODO: Remove this negative. It's only there temporarily to display the graph.
         this.balance_history.push({
             "date": current_date, 
-            "balance": -this.balance
+            "balance": -this.balance,
+            "payment": payment
         })
 
         this.num_months += 1

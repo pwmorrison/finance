@@ -22,7 +22,7 @@ export default class LoanSimulatorLine{
 				// this.yAxisGroup;
 				// this.g;
 
-				this.lineChart1 = new LineChart("#chart-area-2", "bitcoin");
+				this.lineChart1 = new LineChart("#chart-area-2", "bitcoin", ["balance", "payment"]);
 		}
 
 
