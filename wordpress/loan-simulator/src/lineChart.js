@@ -189,10 +189,21 @@ export default class LineChart {
 						const d0 = vis.dataTimeFiltered[i - 1]
 						const d1 = vis.dataTimeFiltered[i]
 						const d = x0 - d0["date"] > d1["date"] - x0 ? d1 : d0
-						vis.focus.attr("transform", `translate(${vis.x(d["date"])}, ${vis.y(d["balance"])})`)
-						vis.focus.select("text").text(d["balance"])
-						vis.focus.select(".x-hover-line").attr("y2", vis.HEIGHT - vis.y(d["balance"]))
-						vis.focus.select(".y-hover-line").attr("x2", -vis.x(d["date"]))
+						//vis.focus.attr("transform", `translate(${vis.x(d["date"])}, ${vis.y(d["balance"])})`)
+						vis.focus.attr("transform", `translate(${vis.x(d["date"])}, 0)`)  // Only translate horizontally, so we can overlay all lines.
+						vis.focus.select("circle").attr("transform", `translate(0, ${vis.y(d["balance"])})`)  // Translate the circle downward.
+						vis.focus.select("text")  // Move text the the right of the data point.
+							.text(d["balance"])
+							.attr("y", vis.y(d["balance"]))
+						//vis.focus.select(".x-hover-line").attr("y2", vis.HEIGHT - vis.y(d["balance"]))
+						vis.focus.select(".x-hover-line")  // Draw vertical line from the point to the x-axis.
+							.attr("y1", vis.y(d["balance"]))
+							.attr("y2", vis.HEIGHT)
+						//vis.focus.select(".y-hover-line").attr("x2", -vis.x(d["date"]))
+						vis.focus.select(".y-hover-line")  // Draw horizontal line from the point to the y-axis.
+							.attr("x2", -vis.x(d["date"]))
+							.attr("y1", vis.y(d["balance"]))
+							.attr("y2", vis.y(d["balance"]))
 				}
 		}
 		
