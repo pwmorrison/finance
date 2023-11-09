@@ -153,27 +153,35 @@ export default class LineChart {
 						.attr("class", "focus")
 						.style("display", "none")
 		
-				// Vertical line from the data point to the x-axis.
+				// Single vertical line from the highest data point to the x-axis.
 				vis.focus.append("line")
 						.attr("class", "x-hover-line hover-line")
 						.attr("y1", 0)
 						.attr("y2", vis.HEIGHT)
 		
-				// Horizontal line from the data point to the y-axis.
-				vis.focus.append("line")
+				// Add components for each key.
+				for (let key of vis.keys) {
+					// Horizontal line from the data point to the y-axis.
+					vis.focus.append("line")
+						.attr("id", "line-" + key)
 						.attr("class", "y-hover-line hover-line")
 						.attr("x1", 0)
 						.attr("x2", vis.WIDTH)
-		
-				// Circle at the top-left corder of the focus group.
-				vis.focus.append("circle")
+				
+					// Circle at the top-left corder of the focus group.
+					vis.focus.append("circle")
+						.attr("id", "circle-" + key)
 						.attr("r", 7.5)
-		
-				// Text relative to the top-left corner of the focus group.
-				// The group is translated to the data point, which moves the text.
-				vis.focus.append("text")
+
+					// Text relative to the top-left corner of the focus group.
+					// The group is translated to the data point, which moves the text.
+					vis.focus.append("text")
+						.attr("id", "text-" + key)
 						.attr("x", 15)
-						.attr("dy", ".31em")
+						.attr("dy", ".31em")	
+				}
+		
+				
 		
 				// Overlay rectangle covering the entire plot.
 				// Shows/hides the focus group, and captures mouse movements within the plot.
@@ -197,26 +205,33 @@ export default class LineChart {
 						const d = x0 - d0["date"] > d1["date"] - x0 ? d1 : d0
 						//vis.focus.attr("transform", `translate(${vis.x(d["date"])}, ${vis.y(d["balance"])})`)
 						vis.focus.attr("transform", `translate(${vis.x(d["date"])}, 0)`)  // Only translate horizontally, so we can overlay all lines.
-						vis.focus.select("circle").attr("transform", `translate(0, ${vis.y(d["balance"])})`)  // Translate the circle downward.
-						vis.focus.select("text")  // Move text the the right of the data point.
-							.text(d["balance"])
-							.attr("y", vis.y(d["balance"]))
+						for (let key of vis.keys) {
+							vis.focus.select("#circle-" + key)
+								.attr("transform", `translate(0, ${vis.y(d[key])})`)  // Translate the circle downward.						
+							
+							vis.focus.select("#text-" + key)  // Move text the the right of the data point.
+								.text(d[key])
+								.attr("y", vis.y(d[key]))
+
+							vis.focus.select("#line-" + key)  // Draw horizontal line from the point to the y-axis.
+								.attr("x2", -vis.x(d["date"]))
+								.attr("y1", vis.y(d[key]))
+								.attr("y2", vis.y(d[key]))
+						}
 						//vis.focus.select(".x-hover-line").attr("y2", vis.HEIGHT - vis.y(d["balance"]))
-						vis.focus.select(".x-hover-line")  // Draw vertical line from the point to the x-axis.
-							.attr("y1", vis.y(d["balance"]))
+						vis.focus.select(".x-hover-line")  // Draw vertical line from the highest point to the x-axis.
+							.attr("y1", vis.y(d3.max(vis.keys.map(k => d[k]))))
+							//.attr("y1", vis.y(d["balance"]))
 							.attr("y2", vis.HEIGHT)
 						//vis.focus.select(".y-hover-line").attr("x2", -vis.x(d["date"]))
-						vis.focus.select(".y-hover-line")  // Draw horizontal line from the point to the y-axis.
-							.attr("x2", -vis.x(d["date"]))
-							.attr("y1", vis.y(d["balance"]))
-							.attr("y2", vis.y(d["balance"]))
+						
 				}
 		}
 		
 		/******************************** Tooltip Code ********************************/
 	
 		vis.lines = {};
-		for (let key of this.keys) {
+		for (let key of vis.keys) {
 			// Path generator
 			vis.lines[key] = d3.line()
 				.x(d => vis.x(d["date"]))
