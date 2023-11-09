@@ -141,27 +141,36 @@ export default class LineChart {
 		/******************************** Tooltip Code ********************************/
 	
 		if (1) {
+				// Focus group housing the focus circle, lines, and text.
+				// Gets translated to the data point closest to the mouse location.
 				vis.focus = vis.g.append("g")
 						.attr("class", "focus")
 						.style("display", "none")
 		
+				// Vertical line from the data point to the x-axis.
 				vis.focus.append("line")
 						.attr("class", "x-hover-line hover-line")
 						.attr("y1", 0)
 						.attr("y2", vis.HEIGHT)
 		
+				// Horizontal line from the data point to the y-axis.
 				vis.focus.append("line")
 						.attr("class", "y-hover-line hover-line")
 						.attr("x1", 0)
 						.attr("x2", vis.WIDTH)
 		
+				// Circle at the top-left corder of the focus group.
 				vis.focus.append("circle")
 						.attr("r", 7.5)
 		
+				// Text relative to the top-left corner of the focus group.
+				// The group is translated to the data point, which moves the text.
 				vis.focus.append("text")
 						.attr("x", 15)
 						.attr("dy", ".31em")
 		
+				// Overlay rectangle covering the entire plot.
+				// Shows/hides the focus group, and captures mouse movements within the plot.
 				vis.g.append("rect")
 						.attr("class", "overlay")
 						.attr("width", vis.WIDTH)
@@ -170,6 +179,10 @@ export default class LineChart {
 						.on("mouseout", () => vis.focus.style("display", "none"))
 						.on("mousemove", mousemove)
 		
+				// Find the data point closest to the mouse location.
+				// Translate the focus group to the data point.
+				// Extend the vertical (x) line down to the x-axis.
+				// Extend the horizontal (y) line to the left to the y-axis.
 				function mousemove() {
 						const x0 = vis.x.invert(d3.mouse(this)[0])
 						const i = vis.bisectDate(vis.dataTimeFiltered, x0, 1)
