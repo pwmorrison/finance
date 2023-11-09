@@ -32,6 +32,7 @@ export default class LineChart {
 		// time parsers/formatters
 		vis.parseTime = d3.timeParse("%d/%m/%Y")
 		vis.formatTime = d3.timeFormat("%d/%m/%Y")
+		vis.formatAmount = d3.format("$,.2f")
 		// for tooltip
 		vis.bisectDate = d3.bisector(d => d["date"]).left
 		
@@ -210,7 +211,7 @@ export default class LineChart {
 								.attr("transform", `translate(0, ${vis.y(d[key])})`)  // Translate the circle downward.						
 							
 							vis.focus.select("#text-" + key)  // Move text the the right of the data point.
-								.text(d[key])
+								.text(vis.formatAmount(d[key]))
 								.attr("y", vis.y(d[key]))
 
 							vis.focus.select("#line-" + key)  // Draw horizontal line from the point to the y-axis.
