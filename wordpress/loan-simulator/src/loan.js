@@ -47,12 +47,6 @@ export default class Loan extends Account {
 
         console.log("IO period: " + io_term_months);
 
-        this.balance_history.push({
-            "date": start_date,  
-            "balance": -initial_balance,
-            "payment": 0
-        });
-
         // date, total repayment, interest repayment, principal repayment.
         this.repayment_history = [];
 
@@ -63,14 +57,24 @@ export default class Loan extends Account {
         console.log('Start balance: ' + this.balance);
 
         // Calculate the monthly repayments.
+        this.amount_owing;
         if (this.is_io) {
             this.io_monthly_repayment = calculate_io_monthly_repayment(this.balance, this.interest_rate);
             this.pi_monthly_repayment = calculate_p_i_monthly_repayment(this.balance, this.interest_rate,
                                                                         this.loan_term_months - this.io_term_months);
+            this.amount_owing = this.io_monthly_repayment * this.io_term_months + this.pi_monthly_repayment * (this.loan_term_months - this.io_term_months);
         } else {
             this.io_monthly_repayment = null;
             this.pi_monthly_repayment = calculate_p_i_monthly_repayment(this.balance, this.interest_rate, this.loan_term_months);
+            this.amount_owing = this.pi_monthly_repayment * this.loan_term_months;
         }
+
+        this.balance_history.push({
+            "date": start_date,  
+            "balance": -initial_balance,
+            "amount_owing": this.amount_owing,
+            "payment": 0
+        });
     }
 
     get_monthly_repayment() {
@@ -111,10 +115,13 @@ export default class Loan extends Account {
             this.deposit(payment)
         }
 
+        this.amount_owing -= payment;
+
         // TODO: Remove this negative. It's only there temporarily to display the graph.
         this.balance_history.push({
             "date": current_date, 
             "balance": -this.balance,
+            "amount_owing": this.amount_owing,
             "payment": payment
         })
 

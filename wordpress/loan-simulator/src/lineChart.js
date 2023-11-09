@@ -112,9 +112,15 @@ export default class LineChart {
 
 		// update scales
 		vis.x.domain(d3.extent(vis.dataTimeFiltered, d => d["date"]))
+		// vis.y.domain([
+		// 	d3.min(vis.dataTimeFiltered, d => d["balance"]) / 1.005, 
+		// 	d3.max(vis.dataTimeFiltered, d => d["balance"]) * 1.005
+		// ])
+
+		// Use the maximum key value at each time step.
 		vis.y.domain([
-			d3.min(vis.dataTimeFiltered, d => d["balance"]) / 1.005, 
-			d3.max(vis.dataTimeFiltered, d => d["balance"]) * 1.005
+			d3.min(vis.dataTimeFiltered, d => d3.min(vis.keys.map(k => d[k]))) / 1.005, 
+			d3.max(vis.dataTimeFiltered, d => d3.max(vis.keys.map(k => d[k]))) * 1.005
 		])
 	
 		// fix for format values
