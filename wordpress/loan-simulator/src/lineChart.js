@@ -84,6 +84,10 @@ export default class LineChart {
 			.attr("transform", `translate(0, ${vis.HEIGHT})`)
 		vis.yAxis = vis.g.append("g")
 			.attr("class", "y axis")
+
+
+		vis.color = d3.scaleOrdinal(d3.schemeCategory10)  // d3.schemeAccent
+		vis.addLegend();
 				
 		//vis.wrangleData()
 	}
@@ -99,8 +103,7 @@ export default class LineChart {
 		// 	return ((d.date >= vis.sliderValues[0]) && (d.date <= vis.sliderValues[1]))
 		// })
 
-		vis.color = d3.scaleOrdinal(d3.schemeCategory10)  // d3.schemeAccent
-		vis.addLegend();
+		
 
     vis.dataTimeFiltered = data
 		vis.updateVis()

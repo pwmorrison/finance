@@ -95,13 +95,21 @@ function Quiz(props) {
         let sim = new LoanSimulatorLine();
         console.log(sim);
         sim.setup_sim_vis();
-        setLoanSimulator(sim);
+        setLoanSimulator(sim, () => {console.log("callback")});
         
       }, [msg])
 
-      useEffect(() => {
-        myFunc()
-      }, [myFunc])
+    // useEffect(() => {
+    //   myFunc()
+    // }, [myFunc])
+
+    useEffect(() => {
+      let sim = new LoanSimulatorLine();
+      console.log(sim);
+      sim.setup_sim_vis();
+      sim.run_loan_simulator(loanStartBalance, interestRate, loanLength, interestOnlyPeriod);
+      setLoanSimulator(sim);
+    }, [])
 
     return (
       <div className="loan-simulator-frontend">
