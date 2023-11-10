@@ -99,6 +99,9 @@ export default class LineChart {
 		// 	return ((d.date >= vis.sliderValues[0]) && (d.date <= vis.sliderValues[1]))
 		// })
 
+		vis.color = d3.scaleOrdinal(d3.schemeCategory10)  // d3.schemeAccent
+		vis.addLegend();
+
     vis.dataTimeFiltered = data
 		vis.updateVis()
 	}
@@ -242,6 +245,11 @@ export default class LineChart {
 			vis.g.select(".line-" + key)
 				.transition(vis.t)
 				.attr("d", vis.lines[key](vis.dataTimeFiltered))	
+				
+
+				vis.g.select(".line-" + key)
+					.attr("stroke-width", 3)
+					.attr("stroke", vis.color(key))
 		}
 		// // Path generator
 		// vis.line = d3.line()
@@ -259,5 +267,39 @@ export default class LineChart {
 				: "24 Hour Trading Volume ($)"
 		vis.yLabel.text(newText)
 	}
+
+	addLegend() {
+	  const vis = this
+
+    const legend = vis.g.append("g")
+      //.attr("transform", "translate(150, -30)")
+			.attr("transform", `translate(${vis.WIDTH}, 0)`)
+
+    // const legendArray = [
+    // 	{ label: "Small", color: vis.color("small") },
+    // 	{ label: "Medium", color: vis.color("medium") },
+    // 	{ label: "Large", color: vis.color("large") }
+	  // ]
+		const legendArray = vis.keys.map((k) => ({"label": k, color: vis.color(k)}))
+
+    const legendRow = legend.selectAll(".legendRow")
+      .data(legendArray)
+      .enter().append("g")
+        .attr("class", "legendRow")
+        .attr("transform", (d, i) => `translate(0, ${i * 20})`)
+        
+    legendRow.append("rect")
+      .attr("class", "legendRect")
+      .attr("width", 10)
+      .attr("height", 10)
+      .attr("fill", d => d.color)
+
+    legendRow.append("text")
+      .attr("class", "legendText")
+      .attr("x", -10)
+      .attr("y", 10)
+      .attr("text-anchor", "end")
+      .text(d => d.label) 
+  }
 }
 
