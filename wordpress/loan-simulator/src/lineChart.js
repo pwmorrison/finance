@@ -11,6 +11,8 @@ export default class LineChart {
 		this.coin = _coin
 		this.keys = _keys;
 
+		this.tooltip_offsets = [".5em", "-.5em"];
+
 		this.initVis()
 	}
 
@@ -185,10 +187,10 @@ export default class LineChart {
 					vis.focus.append("text")
 						.attr("id", "text-" + key)
 						.attr("x", 15)
-						.attr("dy", ".31em")	
+						.attr("dominant-baseline", "middle")
+						//.attr("dy", ".31em")  // .31em	
+						.attr("color", vis.color[key])
 				}
-		
-				
 		
 				// Overlay rectangle covering the entire plot.
 				// Shows/hides the focus group, and captures mouse movements within the plot.
@@ -212,13 +214,16 @@ export default class LineChart {
 						const d = x0 - d0["date"] > d1["date"] - x0 ? d1 : d0
 						//vis.focus.attr("transform", `translate(${vis.x(d["date"])}, ${vis.y(d["balance"])})`)
 						vis.focus.attr("transform", `translate(${vis.x(d["date"])}, 0)`)  // Only translate horizontally, so we can overlay all lines.
-						for (let key of vis.keys) {
+						for (let ind in vis.keys) {
+							let key = vis.keys[ind];
 							vis.focus.select("#circle-" + key)
 								.attr("transform", `translate(0, ${vis.y(d[key])})`)  // Translate the circle downward.						
 							
 							vis.focus.select("#text-" + key)  // Move text the the right of the data point.
 								.text(vis.formatAmount(d[key]))
 								.attr("y", vis.y(d[key]))
+								.attr("dy", vis.tooltip_offsets[ind])
+								.attr("fill", vis.color(key))
 
 							vis.focus.select("#line-" + key)  // Draw horizontal line from the point to the y-axis.
 								.attr("x2", -vis.x(d["date"]))
