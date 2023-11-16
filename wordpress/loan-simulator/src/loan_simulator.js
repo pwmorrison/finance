@@ -57,19 +57,22 @@ export default class LoanSimulator{
 				const formatTime = d3.timeFormat("%d/%m/%Y")
 
 				// add jQuery UI slider
+				$("#dateLabel1").text(formatTime(start_date))
+				$("#dateLabel2").text(formatTime(current_date))
 				$("#date-slider").slider({
 						range: true,
-						max: parseTime("31/10/2017").getTime(),
-						min: parseTime("12/5/2013").getTime(),
+						max: current_date.getTime(),//parseTime("31/10/2017").getTime(),
+						min: start_date.getTime(),//parseTime("12/5/2013").getTime(),
 						step: 86400000, // one day
 						values: [
-								parseTime("12/5/2013").getTime(),
-								parseTime("31/10/2017").getTime()
+								start_date.getTime(),//parseTime("12/5/2013").getTime(),
+								current_date.getTime()//parseTime("31/10/2017").getTime()
 						],
 						slide: (event, ui) => {
 								$("#dateLabel1").text(formatTime(new Date(ui.values[0])))
-								// $("#dateLabel2").text(formatTime(new Date(ui.values[1])))
+								$("#dateLabel2").text(formatTime(new Date(ui.values[1])))
 								// updateCharts()
+								this.lineChart1.wrangleData(loan_history);
 						}
 				})
 

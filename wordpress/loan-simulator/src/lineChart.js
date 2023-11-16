@@ -6,11 +6,12 @@
 
 export default class LineChart {
 	// constructor function - make a new visualization object.
-	constructor(_parentElement, _coin, _keys) {
+	constructor(_parentElement, _title, _keys) {
 		this.parentElement = _parentElement
-		this.coin = _coin
+		this.title = _title  // TODO: Render title.
 		this.keys = _keys;
 
+		// TODO: Make constructor args.
 		this.tooltip_offsets = [".5em", "-.5em"];
 
 		this.initVis()
@@ -59,7 +60,7 @@ export default class LineChart {
 			.attr("x", vis.WIDTH / 2)
 			.attr("font-size", "20px")
 			.attr("text-anchor", "middle")
-			.text(vis.coin)
+			.text("Date")
 		vis.yLabel = vis.g.append("text")
 			.attr("class", "y axisLabel")
 			.attr("transform", "rotate(-90)")
@@ -67,7 +68,7 @@ export default class LineChart {
 			.attr("x", -170)
 			.attr("font-size", "20px")
 			.attr("text-anchor", "middle")
-			.text("Price ($)")
+			.text("Amount ($)")
 		
 		// scales
 		vis.x = d3.scaleTime().range([0, vis.WIDTH])
@@ -99,15 +100,17 @@ export default class LineChart {
 		const vis = this
 
 		// filter data based on selections
-		// vis.yValue = $("#var-select").val()
-		// vis.sliderValues = $("#date-slider").slider("values")
-		// vis.dataTimeFiltered = filteredData[vis.coin].filter(d => {
-		// 	return ((d.date >= vis.sliderValues[0]) && (d.date <= vis.sliderValues[1]))
-		// })
+		//vis.yValue = $("#var-select").val()
+		
+		vis.sliderValues = $("#date-slider").slider("values")
+		console.log("SLIDER VALS: " + vis.sliderValues)
+		vis.dataTimeFiltered = data.filter(d => {
+			return ((d.date >= vis.sliderValues[0]) && (d.date <= vis.sliderValues[1]))
+		})
 
 		
 
-    vis.dataTimeFiltered = data
+    //vis.dataTimeFiltered = data
 		vis.updateVis()
 	}
 
