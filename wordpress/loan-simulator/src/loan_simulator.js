@@ -17,10 +17,7 @@ export default class LoanSimulator{
 
 	constructor() {
 			this.lineChart1 = new LineChart("#chart-area", "bitcoin", ["balance", "amount_owing"]);
-
-			this.timeline = new Timeline('#timeline', this.brushed, this.lineChart1);
-
-			
+			this.timeline = new Timeline('#timeline', this.lineChart1);
 	}
 
 	run_loan_simulator(loan_start_balance, interest_rate, loan_length, interest_only_period) {
@@ -91,23 +88,5 @@ export default class LoanSimulator{
 		//this.update(loan_history);
 		this.lineChart1.wrangleData(loan_history);
 		this.timeline.wrangleData(loan_history);
-	}
-
-	// TODO: Make this a callback function that is independent of d3, so that "this" refers to the class instance, not the callback context.
-	brushed(val, timeline) {
-		console.log("CALLED BRUSHED FN" + val)
-		console.log(timeline);
-		const selection = d3.event.selection || timeline.x.range()
-		const newValues = selection.map(timeline.x.invert)
-
-		
-	
-		$("#date-slider")
-			.slider('values', 0, newValues[0])
-			.slider('values', 1, newValues[1])
-		$("#dateLabel1").text(formatTime(newValues[0]))
-		$("#dateLabel2").text(formatTime(newValues[1]))
-	
-		this.lineChart1.wrangleData()
 	}
 }
