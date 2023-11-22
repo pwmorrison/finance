@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react'
 import ReactDOM from 'react-dom'
-import * as d3 from "d3";
+//import * as d3 from "d3";
 //require('d3')
 import "./frontend.scss"
 import LoanSimulator from './loan_simulator'
@@ -115,8 +115,8 @@ function LoanSimulatorComponent(props) {
         <label>Date: <span id="dateLabel1">12/05/2013</span> - <span id="dateLabel2">31/10/2017</span></label>
         <div id="date-slider"></div>
       </div>
-      <div id="chart-area">
-      </div>
+      <div id="chart-area"></div>
+      <div id="timeline"></div>
     </div>
   )
 }

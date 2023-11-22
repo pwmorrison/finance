@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "wp-scripts build src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js",
-    "start": "wp-scripts start src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js",
+    "build": "wp-scripts build src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js src/loan_simulator.js src/lineChart.js src/timeline.js",
+    "start": "wp-scripts start src/index.js src/frontend.js src/loan.js src/investment.js src/utils.js src/account.js src/loan_simulator.js src/lineChart.js src/timeline.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.2",
-    "d3": "^7.8.5",
     "jquery": "^3.7.1"
   }
 }
