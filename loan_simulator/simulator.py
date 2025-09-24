@@ -194,7 +194,7 @@ def main_savingsonly():
         savings_account.determine_extra_monthly_investment_funds(repaid_loans)
 
         for account in accounts:
-            account.process_transactions()
+            account.process_transactions(process_date)
         for account in accounts:
             account.accrue_interest()
 

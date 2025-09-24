@@ -48,7 +48,7 @@ class Loan(Account):
     def get_monthly_repayment(self):
         return self.monthly_repayment
 
-    def process_transactions(self):
+    def process_transactions(self, current_date):
         balance = self.get_balance()
         if balance < 0:
             # Deduct loan payment from loan account.

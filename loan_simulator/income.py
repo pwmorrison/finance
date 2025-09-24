@@ -8,7 +8,7 @@ class IncomeSource(Account):
         self.monthly_income = monthly_income
         self.dest_account = dest_account
 
-    def process_transactions(self):
+    def process_transactions(self, current_date):
         self.dest_account.deposit(self.monthly_income)
 
     def accrue_interest(self):
